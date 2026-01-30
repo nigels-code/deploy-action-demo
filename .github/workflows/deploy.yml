@@ -16,7 +16,7 @@ jobs:
 
         strategy:
             matrix:
-                environment: ['dev', 'staging', deploy-prod-unsafe]
+                environment: ['dev', 'staging', 'deploy-prod-unsafe']
 
         environment: ${{ matrix.environment }}
 
