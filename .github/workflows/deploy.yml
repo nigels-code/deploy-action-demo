@@ -16,7 +16,7 @@ jobs:
 
         strategy:
             matrix:
-                environment: ['dev', 'staging']
+                environment: ['dev', 'staging', deploy-prod-unsafe]
 
         environment: ${{ matrix.environment }}
 
@@ -32,19 +32,27 @@ jobs:
         environment: prod-safe
 
         steps:
+          - name: Get last successful staging deployment
+            id: staging
+            run: |
+              SHA=$(gh api \
+                repos/${{ github.repository }}/deployments \
+                --jq '.[] | select(.environment=="staging") | .sha' | head -n 1)
 
-            - name: deploy
-              run: echo "Deploying to prod (safe)"
-              env:
-                  DEPLOY_ENVIRONMENT: prod-safe
+              echo "sha=$SHA" >> $GITHUB_OUTPUT
+            env:
+              GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    deploy-prod-unsafe:
-        runs-on: ubuntu-latest
-        environment: prod-unsafe
+          - name: Ensure prod deploy matches staging
+            run: |
+              if [ "${{ github.sha }}" != "${{ steps.staging.outputs.sha }}" ]; then
+                echo "❌ Production must deploy the same commit as staging"
+                echo "Staging: ${{ steps.staging.outputs.sha }}"
+                echo "Prod:    ${{ github.sha }}"
+                exit 1
+              fi
 
-        steps:
-
-            - name: deploy
-              run: echo "Deploying to prod (unsafe)"
-              env:
-                  DEPLOY_ENVIRONMENT: prod-unsafe
+          - name: deploy
+            run: echo "Deploying to prod (safe)"
+            env:
+                DEPLOY_ENVIRONMENT: prod-safe
