@@ -1,0 +1,28 @@
+name: Cdk deploy
+
+on:
+    push:
+        branches:
+            - main
+
+permissions:
+    id-token: write
+    contents: read
+    packages: read
+
+jobs:
+    deploy:
+        runs-on: ubuntu-latest
+
+        strategy:
+            matrix:
+                environment: ['dev', 'staging', 'prod']
+
+        environment: ${{ matrix.environment }}
+
+        steps:
+
+            - name: deploy
+              run: npx deploy --all --require-approval never
+              env:
+                  DEPLOY_ENVIRONMENT: ${{ matrix.environment }}
