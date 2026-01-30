@@ -4,16 +4,6 @@ on:
     push:
         branches:
             - main
-    workflow_dispatch:
-        inputs:
-            prod_deploy:
-                description: 'Production deploy type'
-                required: true
-                type: choice
-                options:
-                    - none
-                    - safe
-                    - unsafe
 
 permissions:
     id-token: write
@@ -23,7 +13,6 @@ permissions:
 jobs:
     deploy:
         runs-on: ubuntu-latest
-        if: github.event_name == 'push'
 
         strategy:
             matrix:
@@ -37,31 +26,3 @@ jobs:
               run: echo "Deploying to $DEPLOY_ENVIRONMENT"
               env:
                   DEPLOY_ENVIRONMENT: ${{ matrix.environment }}
-    
-    deploy-prod-safe:
-        runs-on: ubuntu-latest
-        if: github.event.inputs.prod_deploy == 'safe'
-
-        environment: prod
-
-        steps:
-
-            - name: deploy
-              run: echo "Deploying to $DEPLOY_ENVIRONMENT ($DEPLOY_MODE)"
-              env:
-                  DEPLOY_ENVIRONMENT: prod
-                  DEPLOY_MODE: safe
-
-    deploy-prod-unsafe:
-        runs-on: ubuntu-latest
-        if: github.event.inputs.prod_deploy == 'unsafe'
-
-        environment: prod
-
-        steps:
-
-            - name: deploy
-              run: echo "Deploying to $DEPLOY_ENVIRONMENT ($DEPLOY_MODE)"
-              env:
-                  DEPLOY_ENVIRONMENT: prod
-                  DEPLOY_MODE: unsafe
