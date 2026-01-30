@@ -34,6 +34,7 @@ jobs:
         steps:
 
             - name: deploy
+              run: echo "Deploying to $DEPLOY_ENVIRONMENT"
               env:
                   DEPLOY_ENVIRONMENT: ${{ matrix.environment }}
     
@@ -46,6 +47,7 @@ jobs:
         steps:
 
             - name: deploy
+              run: echo "Deploying to $DEPLOY_ENVIRONMENT ($DEPLOY_MODE)"
               env:
                   DEPLOY_ENVIRONMENT: prod
                   DEPLOY_MODE: safe
@@ -59,6 +61,7 @@ jobs:
         steps:
 
             - name: deploy
+              run: echo "Deploying to $DEPLOY_ENVIRONMENT ($DEPLOY_MODE)"
               env:
                   DEPLOY_ENVIRONMENT: prod
                   DEPLOY_MODE: unsafe
