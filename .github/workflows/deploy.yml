@@ -26,3 +26,25 @@ jobs:
               run: echo "Deploying to $DEPLOY_ENVIRONMENT"
               env:
                   DEPLOY_ENVIRONMENT: ${{ matrix.environment }}
+
+    deploy-prod-safe:
+        runs-on: ubuntu-latest
+        environment: prod-safe
+
+        steps:
+
+            - name: deploy
+              run: echo "Deploying to prod (safe)"
+              env:
+                  DEPLOY_ENVIRONMENT: prod-safe
+
+    deploy-prod-unsafe:
+        runs-on: ubuntu-latest
+        environment: prod-unsafe
+
+        steps:
+
+            - name: deploy
+              run: echo "Deploying to prod (unsafe)"
+              env:
+                  DEPLOY_ENVIRONMENT: prod-unsafe
