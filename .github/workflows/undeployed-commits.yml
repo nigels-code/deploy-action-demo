@@ -26,7 +26,7 @@ jobs:
                     git log --oneline
                   else
                     EXCLUDE=$(echo "$PROD_TAGS" | sed 's/^/^/' | tr '\n' ' ')
-                    RESULT=$(git log --oneline HEAD $EXCLUDE)
+                    RESULT=$(git log --oneline --no-merges HEAD $EXCLUDE)
                     if [ -z "$RESULT" ]; then
                       echo "✅ All commits have been deployed to prod"
                     else
