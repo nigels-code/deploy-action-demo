@@ -33,5 +33,7 @@ jobs:
                     echo "No prod tags found - listing all commits:"
                     git log --oneline
                   else
-                    git log --oneline $(echo "$PROD_TAGS" | sed 's/^/^/')
+                    EXCLUDE=$(echo "$PROD_TAGS" | sed 's/^/^/' | tr '\n' ' ')
+                    echo "Excluding tags: $EXCLUDE"
+                    git log --oneline HEAD $EXCLUDE || echo "No undeployed commits found"
                   fi
