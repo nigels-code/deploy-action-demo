@@ -7,7 +7,7 @@ on:
 
 permissions:
     id-token: write
-    contents: read
+    contents: write
     packages: read
 
 jobs:
@@ -16,43 +16,23 @@ jobs:
 
         strategy:
             matrix:
-                environment: ['dev', 'staging', 'prod-unsafe']
+                environment: ['dev', 'staging', 'prod']
 
         environment: ${{ matrix.environment }}
 
         steps:
+
+            - name: Checkout
+              uses: actions/checkout@v4
 
             - name: deploy
               run: echo "Deploying to $DEPLOY_ENVIRONMENT"
               env:
                   DEPLOY_ENVIRONMENT: ${{ matrix.environment }}
 
-    deploy-prod-safe:
-        runs-on: ubuntu-latest
-        environment: prod-safe
+            - name: Tag prod deployment
+              if: matrix.environment == 'prod'
+              run: |
+                  git tag "prod/${{ github.sha }}"
+                  git push origin "prod/${{ github.sha }}"
 
-        steps:
-          - name: Get last successful staging deployment
-            id: staging
-            run: |
-              SHA=$(gh api \
-                repos/${{ github.repository }}/deployments \
-                --jq '.[] | select(.environment=="staging") | .sha' | head -n 1)
-
-              echo "sha=$SHA" >> $GITHUB_OUTPUT
-            env:
-              GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-          - name: Ensure prod deploy matches staging
-            run: |
-              if [ "${{ github.sha }}" != "${{ steps.staging.outputs.sha }}" ]; then
-                echo "❌ Production must deploy the same commit as staging"
-                echo "Staging: ${{ steps.staging.outputs.sha }}"
-                echo "Prod:    ${{ github.sha }}"
-                exit 1
-              fi
-
-          - name: deploy
-            run: echo "Deploying to prod (safe)"
-            env:
-                DEPLOY_ENVIRONMENT: prod-safe
