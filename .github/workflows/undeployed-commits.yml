@@ -19,11 +19,19 @@ jobs:
 
             - name: List commits not deployed to prod
               run: |
+                  echo "=== Debug info ==="
+                  echo "Current branch: $(git branch --show-current)"
+                  echo "All branches:"
+                  git branch -a
+                  echo "All tags:"
+                  git tag -l
+                  echo "=== End debug ==="
+
                   echo "Commits not deployed to prod:"
                   PROD_TAGS=$(git tag -l "prod/*")
                   if [ -z "$PROD_TAGS" ]; then
                     echo "No prod tags found - listing all commits:"
-                    git log --oneline origin/main
+                    git log --oneline
                   else
-                    git log --oneline origin/main $(echo "$PROD_TAGS" | sed 's/^/^/')
+                    git log --oneline $(echo "$PROD_TAGS" | sed 's/^/^/')
                   fi
