@@ -1,0 +1,29 @@
+name: undeployed-commits
+
+on:
+    workflow_dispatch:
+
+jobs:
+    undeployed-commits:
+        runs-on: ubuntu-latest
+
+        steps:
+
+            - name: Checkout
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+
+            - name: Fetch tags
+              run: git fetch --tags
+
+            - name: List commits not deployed to prod
+              run: |
+                  echo "Commits not deployed to prod:"
+                  PROD_TAGS=$(git tag -l "prod/*")
+                  if [ -z "$PROD_TAGS" ]; then
+                    echo "No prod tags found"
+                    git log --oneline main
+                  else
+                    git log --oneline main $(echo "$PROD_TAGS" | sed 's/^/^/')
+                  fi
