@@ -22,8 +22,8 @@ jobs:
                   echo "Commits not deployed to prod:"
                   PROD_TAGS=$(git tag -l "prod/*")
                   if [ -z "$PROD_TAGS" ]; then
-                    echo "No prod tags found"
-                    git log --oneline main
+                    echo "No prod tags found - listing all commits:"
+                    git log --oneline origin/main
                   else
-                    git log --oneline main $(echo "$PROD_TAGS" | sed 's/^/^/')
+                    git log --oneline origin/main $(echo "$PROD_TAGS" | sed 's/^/^/')
                   fi
