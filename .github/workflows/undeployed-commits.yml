@@ -19,14 +19,6 @@ jobs:
 
             - name: List commits not deployed to prod
               run: |
-                  echo "=== Debug info ==="
-                  echo "Current branch: $(git branch --show-current)"
-                  echo "All branches:"
-                  git branch -a
-                  echo "All tags:"
-                  git tag -l
-                  echo "=== End debug ==="
-
                   echo "Commits not deployed to prod:"
                   PROD_TAGS=$(git tag -l "prod/*")
                   if [ -z "$PROD_TAGS" ]; then
@@ -34,6 +26,10 @@ jobs:
                     git log --oneline
                   else
                     EXCLUDE=$(echo "$PROD_TAGS" | sed 's/^/^/' | tr '\n' ' ')
-                    echo "Excluding tags: $EXCLUDE"
-                    git log --oneline HEAD $EXCLUDE || echo "No undeployed commits found"
+                    RESULT=$(git log --oneline HEAD $EXCLUDE)
+                    if [ -z "$RESULT" ]; then
+                      echo "✅ All commits have been deployed to prod"
+                    else
+                      echo "$RESULT"
+                    fi
                   fi
